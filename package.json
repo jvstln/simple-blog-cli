@@ -1,0 +1,29 @@
+{
+  "name": "simple-blog-cli",
+  "version": "1.0.0",
+  "description": "A simple blog cli",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jvstln/simple-blog-cli.git"
+  },
+  "keywords": [
+    "simple",
+    "blog",
+    "cli"
+  ],
+  "author": "Justin Ezema",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jvstln/simple-blog-cli/issues"
+  },
+  "homepage": "https://github.com/jvstln/simple-blog-cli#readme",
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.1"
+  }
+}
