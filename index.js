@@ -58,17 +58,27 @@ const viewPost = async () => {
   }
 
   console.log(colors.italic(`Viewing post: [id=${post.id}]...`));
-  await delay();
+
+  const viewMode = await select({
+    message: "Select view mode:",
+    choices: [
+      { name: "Block", value: "block" },
+      { name: "Table", value: "table" },
+    ],
+  });
+
   separate();
-  console.log(`${colors.green("Post title:")} ${post.title}`);
-  await delay(100);
-  console.log(
-    `${colors.green("Date:")} ${post.date ?? colors.italic("Unknown")}`
-  );
-  await delay(100);
-  console.log(`\n${colors.green("Content:")} ${post.content}`);
-  await delay(100);
-  console.log(`${post.author ? colors.green("Author: ") + post.author : ""}`);
+  if (viewMode === "table") {
+    console.table(post);
+    return;
+  } else {
+    console.log(`${colors.green("Post title:")} ${post.title}`);
+    console.log(
+      `${colors.green("Date:")} ${post.date ?? colors.italic("Unknown")}`
+    );
+    console.log(`\n${colors.green("Content:")} ${post.content}`);
+    console.log(`${post.author ? colors.green("Author: ") + post.author : ""}`);
+  }
   separate();
 };
 
@@ -83,7 +93,9 @@ const createPost = async () => {
   console.log(colors.italic("Creating post..."));
 
   posts.push({
-    ...newPost,
+    id: newPost.id,
+    title: newPost.title,
+    content: newPost.content,
     date: new Date(),
     author: newPost.author === "None" ? undefined : newPost.author,
   });
