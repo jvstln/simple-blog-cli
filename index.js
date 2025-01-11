@@ -206,6 +206,34 @@ const getMenuAction = async () => {
 };
 
 const getPost = async () => {
+  if (posts.length === 0) {
+    // Prompt the user with other options
+    const noPostAnswer = await select({
+      message: colors.yellow("You have no post!"),
+      choices: [
+        { name: "Create one now", value: "create" },
+        { name: "Back to menu", value: "menu" },
+        { name: "Exit", value: "exit" },
+      ],
+    });
+
+    if (noPostAnswer === "create") await createPost();
+    else if (noPostAnswer === "menu") await main();
+    else if (noPostAnswer === "exit") throw new Error("exit");
+    return;
+  }
+
+  if (posts.length === 1) {
+    console.log(
+      `You only have one post. ${colors.italic(
+        "proceeding with post"
+      )} ${colors.cyan(`[${posts[0].title}]`)} `
+    );
+    await delay(2000);
+
+    return posts[0];
+  }
+
   const choicePosts = posts.map((post) => ({
     value: post,
     name: post.title,
@@ -250,7 +278,7 @@ const main = async (defaultAction) => {
     message: "What would you like to do next?",
     choices: [
       {
-        name: `${action[0].toUpperCase() + action.slice(1)} another post`,
+        name: `${action[0].toUpperCase() + action.slice(1)} post`,
         value: action,
       },
       { name: "Back to menu", value: "menu" },
@@ -306,7 +334,6 @@ const transformedHeading = heading
 console.log(colors.bold(transformedHeading));
 
 // Start the main cli loop
-
 try {
   await main();
 } catch {
@@ -314,4 +341,5 @@ try {
   separate();
   console.log(colors.redBright("❌ Exiting..."));
   separate();
+  process.exit();
 }
