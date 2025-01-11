@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import colors from "yoctocolors-cjs";
-import { input, select, search } from "@inquirer/prompts";
+import { input, select, search, confirm } from "@inquirer/prompts";
 
 /* This will contain and manage posts
 Post format: { id, title, date, content, author } */
@@ -83,11 +83,24 @@ const createPost = async () => {
 };
 
 const deletePost = async (id) => {
-  console.log(
-    colors.italic(
-      `Deleting post: [${posts.find((post) => post.id === id).title}}]...`
-    )
-  );
+  const postToDelete = posts.find((post) => post.id === id);
+
+  if (!postToDelete) {
+    console.log(colors.red("Post not found!"));
+    return;
+  }
+
+  const confirmDelete = await confirm({
+    message: "Are you sure you want to delete this post?",
+    default: false,
+  });
+
+  if (!confirmDelete) {
+    console.log(colors.yellow("Post deletion aborted!"));
+    return;
+  }
+
+  console.log(colors.italic(`Deleting post: [${postToDelete.title}}]...`));
   posts = posts.filter((post) => post.id !== id);
   commitPostToFile();
 
