@@ -1,10 +1,13 @@
 import fs from "node:fs/promises";
 import colors from "yoctocolors-cjs";
-import { input, select, search, confirm } from "@inquirer/prompts";
+import { input, select, search, confirm, Separator } from "@inquirer/prompts";
 
 /* This will contain and manage posts
 Post format: { id, title, date, content, author } */
 let posts = [];
+const separate = () => console.log(new Separator().separator.repeat(3));
+const delay = async (milliseconds = 1000) =>
+  new Promise((res) => setTimeout(res, milliseconds));
 
 const commitPostToFile = async () => {
   await fs.writeFile(
@@ -17,23 +20,22 @@ const commitPostToFile = async () => {
 
 const readPostsFromFile = async () => {
   try {
-    (await fs.stat("./posts.json")).isFile();
+    const data = await fs.readFile("./posts.json", "utf8");
+    posts = JSON.parse(data || "[]");
   } catch {
     await fs.writeFile("./posts.json", "[]");
+    posts = [];
   }
-
-  const data = await fs.readFile("./posts.json", "utf8");
-  posts = JSON.parse(data || "[]");
 };
 
 const initializeApp = async () => {
   await readPostsFromFile();
 
-  const heading = `Let's get cooking!`;
+  const heading = `Let's get cooking!\n`;
   console.log(colors.bold(heading));
 };
 
-const viewPost = (id) => {
+const viewPost = async (id) => {
   const post = posts.find((post) => post.id === id);
 
   if (!post) {
@@ -42,12 +44,15 @@ const viewPost = (id) => {
   }
 
   console.log(colors.italic(`Viewing post: [id=${post.id}]...`));
+  await delay();
+  separate();
   console.log(`${colors.green("Post title:")} ${post.title}`);
   console.log(
     `${colors.green("Date:")} ${post.date ?? colors.italic("Unknown")}`
   );
   console.log(`\n${colors.green("Content:")} ${post.content}`);
   console.log(`${post.author ? colors.green("Author: ") + post.author : ""}`);
+  separate();
 };
 
 const createPost = async () => {
@@ -66,6 +71,7 @@ const createPost = async () => {
     default: "None",
   });
 
+  separate();
   console.log(colors.italic("Creating post..."));
 
   const newPost = {
@@ -79,6 +85,7 @@ const createPost = async () => {
   commitPostToFile();
 
   console.log(colors.green(`Post: [${title}] created successfully!`));
+  separate();
   return newPost.id;
 };
 
@@ -90,6 +97,7 @@ const editPost = async (id) => {
     return;
   }
 
+  separate();
   console.log(
     colors.italic(
       `Editing post: [id=${postToEdit.id}]...(press ${colors.bold(
@@ -130,6 +138,7 @@ const editPost = async (id) => {
   console.log(
     colors.green(`Post: [${postToEdit.title}] updated successfully!`)
   );
+  separate();
 };
 
 const deletePost = async (id) => {
@@ -140,6 +149,7 @@ const deletePost = async (id) => {
     return;
   }
 
+  separate();
   const confirmDelete = await confirm({
     message: "Are you sure you want to delete this post?",
     default: false,
@@ -155,10 +165,12 @@ const deletePost = async (id) => {
   commitPostToFile();
 
   console.log(colors.green(`Post deleted successfully!`));
+  separate();
 };
 
 const getMenuAction = async () => {
-  return select({
+  separate();
+  const answer = await select({
     message: "Select an action:",
     choices: [
       {
@@ -187,6 +199,8 @@ const getMenuAction = async () => {
       },
     ],
   });
+  separate();
+  return answer;
 };
 
 const getPost = async () => {
@@ -198,7 +212,8 @@ const getPost = async () => {
     ...post,
   }));
 
-  return search({
+  separate();
+  const selectedPostId = await search({
     message: "Select/Search for a post:",
     source: async (query) => {
       if (!query) return choicePosts;
@@ -210,6 +225,30 @@ const getPost = async () => {
       );
     },
   });
+  separate();
+  return selectedPostId;
+};
+
+const actions = {
+  create: createPost,
+  read: viewPost,
+  update: editPost,
+  delete: deletePost,
+};
+
+const main = async () => {
+  const action = await getMenuAction();
+  let selectedPost = null;
+
+  if (action === "create") {
+    await actions[action](selectedPost);
+  } else {
+    selectedPost = await getPost();
+    await actions[action](selectedPost);
+  }
+
+  main();
 };
 
 await initializeApp();
+await main();
