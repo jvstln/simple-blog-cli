@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import colors from "yoctocolors-cjs";
-import { input } from "@inquirer/prompts";
+import { input, select, search } from "@inquirer/prompts";
 
 /* This will contain and manage posts
 Post format: { id, title, date, content, author } */
@@ -92,6 +92,61 @@ const deletePost = async (id) => {
   commitPostToFile();
 
   console.log(colors.green(`Post deleted successfully!`));
+};
+
+const getMenuAction = async () => {
+  return select({
+    message: "Select an action:",
+    choices: [
+      {
+        name: "Create post",
+        value: "create",
+        short: "[Creation mode]",
+        description: "Create a new post",
+      },
+      {
+        name: "View post",
+        value: "read",
+        short: "[View mode]",
+        description: "View the content of an existing post",
+      },
+      {
+        name: "Edit post",
+        value: "update",
+        short: "[Edit mode]",
+        description: "Edit the content of an existing post",
+      },
+      {
+        name: "Delete post",
+        value: "delete",
+        short: colors.redBright("[Delete mode]"),
+        description: "Delete an existing post (permanently)",
+      },
+    ],
+  });
+};
+
+const getPost = async () => {
+  const choicePosts = posts.map((post) => ({
+    value: post.id,
+    name: post.title,
+    description: post.content.slice(0, 45) + "...",
+    short: `[${post.title}] selected`,
+    ...post,
+  }));
+
+  return search({
+    message: "Select/Search for a post:",
+    source: async (query) => {
+      if (!query) return choicePosts;
+
+      return choicePosts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(query.toLowerCase()) ||
+          post.content.toLowerCase().includes(query.toLowerCase())
+      );
+    },
+  });
 };
 
 await initializeApp();
