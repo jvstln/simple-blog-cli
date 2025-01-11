@@ -1,9 +1,37 @@
+import fs from "node:fs/promises";
 import colors from "yoctocolors-cjs";
 import { input } from "@inquirer/prompts";
 
 /* This will contain and manage posts
 Post format: { id, title, date, content, author } */
 let posts = [];
+
+const commitPostToFile = async () => {
+  await fs.writeFile(
+    "./posts.json",
+    JSON.stringify(posts, (key, value) =>
+      key === "date" ? new Date(value).toLocaleString() : value
+    )
+  );
+};
+
+const readPostsFromFile = async () => {
+  try {
+    (await fs.stat("./posts.json")).isFile();
+  } catch {
+    await fs.writeFile("./posts.json", "[]");
+  }
+
+  const data = await fs.readFile("./posts.json", "utf8");
+  posts = JSON.parse(data || "[]");
+};
+
+const initializeApp = async () => {
+  await readPostsFromFile();
+
+  const heading = `Let's get cooking!`;
+  console.log(colors.bold(heading));
+};
 
 const viewPost = (id) => {
   const post = posts.find((post) => post.id === id);
@@ -48,6 +76,7 @@ const createPost = async () => {
     author: author === "None" ? undefined : author,
   };
   posts.push(newPost);
+  commitPostToFile();
 
   console.log(colors.green(`Post: [${title}] created successfully!`));
   return newPost.id;
@@ -60,5 +89,9 @@ const deletePost = async (id) => {
     )
   );
   posts = posts.filter((post) => post.id !== id);
+  commitPostToFile();
+
   console.log(colors.green(`Post deleted successfully!`));
 };
+
+await initializeApp();
