@@ -1,13 +1,14 @@
 import fs from "node:fs/promises";
-import colors from "yoctocolors-cjs";
+import colors from "yoctocolors-cjs"; // Package found from @inquirer/prompts
 import { input, select, search, confirm, Separator } from "@inquirer/prompts";
 
 /* This will contain and manage posts
 Post format: { id, title, date, content, author } */
 let posts = [];
-const separate = () => console.log(new Separator().separator.repeat(3));
-const delay = async (milliseconds = 1000) =>
+const separate = () => console.log(new Separator().separator.repeat(4));
+const delay = async (milliseconds = 1000) => {
   new Promise((res) => setTimeout(res, milliseconds));
+};
 
 const commitPostToFile = async () => {
   await fs.writeFile(
@@ -60,10 +61,13 @@ const viewPost = async () => {
   await delay();
   separate();
   console.log(`${colors.green("Post title:")} ${post.title}`);
+  await delay(100);
   console.log(
     `${colors.green("Date:")} ${post.date ?? colors.italic("Unknown")}`
   );
+  await delay(100);
   console.log(`\n${colors.green("Content:")} ${post.content}`);
+  await delay(100);
   console.log(`${post.author ? colors.green("Author: ") + post.author : ""}`);
   separate();
 };
@@ -112,6 +116,7 @@ const editPost = async () => {
   if (
     !Object.keys(postToEdit).every((key) => editedPost[key] === postToEdit[key])
   ) {
+    // If something changed in the edit, update the date else keep the old date
     editedPost.date = new Date();
   }
 
@@ -152,9 +157,17 @@ const deletePost = async () => {
 };
 
 const getMenuAction = async () => {
+  const colorMapping = {
+    "create post": colors.green,
+    "view post": colors.cyan,
+    "edit post": colors.blue,
+    "delete post": colors.red,
+    exit: colors.redBright,
+  };
+
   separate();
   const answer = await select({
-    message: "Select an action:",
+    message: "Pick one operation from below:",
     choices: [
       {
         name: "Create post",
@@ -185,6 +198,7 @@ const getMenuAction = async () => {
         value: "exit",
         description: "Exit application",
       },
+      new Separator(),
     ],
   });
   separate();
@@ -260,17 +274,43 @@ const heading = `
  |___/_|_|_|_| .__/_\\___| |___/_\\___/\\__, |  \\___|____|___|
              |_|                     |___/                 
 
-                          Let's get cooking!
-`;
-console.log(colors.bold(heading));
+                          Let's get cooking!`;
+
+const randColors = [
+  colors.black,
+  colors.red,
+  colors.green,
+  colors.yellow,
+  colors.blue,
+  colors.magenta,
+  colors.cyan,
+  colors.white,
+  colors.gray,
+  colors.redBright,
+  colors.greenBright,
+  colors.yellowBright,
+  colors.blueBright,
+  colors.magentaBright,
+  colors.cyanBright,
+  colors.whiteBright,
+];
+
+const transformedHeading = heading
+  .split("")
+  .map((char) => {
+    const randomColor =
+      randColors[Math.floor(Math.random() * randColors.length)];
+    return randomColor(char);
+  })
+  .join("");
+console.log(colors.bold(transformedHeading));
 
 // Start the main cli loop
+
 try {
   await main();
-  separate();
-  console.log(colors.redBright("❌ Exiting..."));
-  separate();
 } catch {
+} finally {
   separate();
   console.log(colors.redBright("❌ Exiting..."));
   separate();
