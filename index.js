@@ -35,6 +35,26 @@ const initializeApp = async () => {
   console.log(colors.bold(heading));
 };
 
+const inquirePost = async (defaultPost) => {
+  const title = await input({
+    message: "Enter post title:",
+    default: defaultPost.title,
+  });
+
+  const content = await input({
+    message: "Enter post content:",
+    default: defaultPost.content,
+    validate: (content) => content.length > 0 || "Content cannot be empty",
+  });
+
+  const author = await input({
+    message: "Enter post author:",
+    default: defaultPost.author,
+  });
+
+  return { ...defaultPost, title, content, author };
+};
+
 const viewPost = async (id) => {
   const post = posts.find((post) => post.id === id);
 
@@ -56,35 +76,23 @@ const viewPost = async (id) => {
 };
 
 const createPost = async () => {
-  const title = await input({
-    message: "Enter post title:",
-    default: "Untitled post",
-  });
-
-  const content = await input({
-    message: "Enter post content:",
-    validate: (content) => content.length > 0 || "Content cannot be empty",
-  });
-
-  const author = await input({
-    message: "Enter post author:",
-    default: "None",
+  const newPost = await inquirePost({
+    id: Math.random().toString().slice(2),
+    title: "Untitled post",
+    author: "None",
   });
 
   separate();
   console.log(colors.italic("Creating post..."));
 
-  const newPost = {
-    id: Math.random().toString().slice(2),
+  posts.push({
+    ...newPost,
     date: new Date(),
-    title,
-    content,
-    author: author === "None" ? undefined : author,
-  };
-  posts.push(newPost);
+    author: newPost.author === "None" ? undefined : newPost.author,
+  });
   commitPostToFile();
 
-  console.log(colors.green(`Post: [${title}] created successfully!`));
+  console.log(colors.green(`Post: [${newPost.title}] created successfully!`));
   separate();
   return newPost.id;
 };
@@ -106,33 +114,15 @@ const editPost = async (id) => {
     )
   );
 
-  const title = await input({
-    message: "Enter post title:",
-    default: postToEdit.title,
-  });
-
-  const content = await input({
-    message: "Enter post content:",
-    default: postToEdit.content,
-    validate: (content) => content.length > 0 || "Content cannot be empty",
-  });
-
-  const author = await input({
-    message: "Enter post author:",
-    default: postToEdit.author ?? "None",
-  });
-
-  const datedPost = { ...postToEdit };
-  postToEdit.title = title;
-  postToEdit.content = content;
-  postToEdit.author = author === "None" ? undefined : author;
+  const editedPost = await inquirePost(postToEdit);
 
   if (
-    !Object.keys(datedPost).every((key) => postToEdit[key] === datedPost[key])
+    !Object.keys(postToEdit).every((key) => editedPost[key] === postToEdit[key])
   ) {
-    postToEdit.date = new Date();
+    editedPost.date = new Date();
   }
 
+  Object.assign(postToEdit, editedPost);
   commitPostToFile();
 
   console.log(
