@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/jvstln/simple-blog-cli#readme",
   "dependencies": {
-    "@inquirer/prompts": "^7.2.1"
+    "@inquirer/prompts": "^7.2.1",
+    "yoctocolors-cjs": "^2.1.2"
   }
 }
