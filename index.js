@@ -28,13 +28,6 @@ const readPostsFromFile = async () => {
   }
 };
 
-const initializeApp = async () => {
-  await readPostsFromFile();
-
-  const heading = `Let's get cooking!\n`;
-  console.log(colors.bold(heading));
-};
-
 const inquirePost = async (defaultPost) => {
   const title = await input({
     message: "Enter post title:",
@@ -256,8 +249,22 @@ const main = async (defaultAction) => {
   else if (nextAction === "menu") await main();
 };
 
-await initializeApp();
+// ----------The above functions and variables contains useful functions that control the cli--
 
+// Initialize the cli
+await readPostsFromFile();
+const heading = `
+  ___ _            _       ___ _              ___ _    ___ 
+ / __(_)_ __  _ __| |___  | _ ) |___  __ _   / __| |  |_ _|
+ \\__ \\ | '  \\| '_ \\ / -_) | _ \\ / _ \\/ _\` | | (__| |__ | | 
+ |___/_|_|_|_| .__/_\\___| |___/_\\___/\\__, |  \\___|____|___|
+             |_|                     |___/                 
+
+                          Let's get cooking!
+`;
+console.log(colors.bold(heading));
+
+// Start the main cli loop
 try {
   await main();
   separate();
