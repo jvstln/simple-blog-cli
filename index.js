@@ -82,6 +82,56 @@ const createPost = async () => {
   return newPost.id;
 };
 
+const editPost = async (id) => {
+  const postToEdit = posts.find((post) => post.id === id);
+
+  if (!postToEdit) {
+    console.log(colors.red("Post not found!"));
+    return;
+  }
+
+  console.log(
+    colors.italic(
+      `Editing post: [id=${postToEdit.id}]...(press ${colors.bold(
+        "TAB"
+      )} to edit, ${colors.bold("ENTER")} to skip)`
+    )
+  );
+
+  const title = await input({
+    message: "Enter post title:",
+    default: postToEdit.title,
+  });
+
+  const content = await input({
+    message: "Enter post content:",
+    default: postToEdit.content,
+    validate: (content) => content.length > 0 || "Content cannot be empty",
+  });
+
+  const author = await input({
+    message: "Enter post author:",
+    default: postToEdit.author ?? "None",
+  });
+
+  const datedPost = { ...postToEdit };
+  postToEdit.title = title;
+  postToEdit.content = content;
+  postToEdit.author = author === "None" ? undefined : author;
+
+  if (
+    !Object.keys(datedPost).every((key) => postToEdit[key] === datedPost[key])
+  ) {
+    postToEdit.date = new Date();
+  }
+
+  commitPostToFile();
+
+  console.log(
+    colors.green(`Post: [${postToEdit.title}] updated successfully!`)
+  );
+};
+
 const deletePost = async (id) => {
   const postToDelete = posts.find((post) => post.id === id);
 
