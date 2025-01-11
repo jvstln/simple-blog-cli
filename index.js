@@ -187,6 +187,11 @@ const getMenuAction = async () => {
         short: colors.redBright("[Delete mode]"),
         description: "Delete an existing post (permanently)",
       },
+      {
+        name: "Exit",
+        value: "exit",
+        description: "Exit application",
+      },
     ],
   });
   separate();
@@ -229,6 +234,8 @@ const actions = {
 const main = async (defaultAction) => {
   const action = defaultAction ?? (await getMenuAction());
 
+  if (action === "exit") return;
+
   await actions[action]();
 
   separate();
@@ -250,6 +257,14 @@ const main = async (defaultAction) => {
 };
 
 await initializeApp();
-await main();
 
-// console.log(await getPost());
+try {
+  await main();
+  separate();
+  console.log(colors.redBright("❌ Exiting..."));
+  separate();
+} catch {
+  separate();
+  console.log(colors.redBright("❌ Exiting..."));
+  separate();
+}
