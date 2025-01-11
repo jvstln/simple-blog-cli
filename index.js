@@ -189,13 +189,13 @@ const getMenuAction = async () => {
       },
       {
         name: "View post",
-        value: "read",
+        value: "view",
         short: "[View mode]",
         description: "View the content of an existing post",
       },
       {
         name: "Edit post",
-        value: "update",
+        value: "edit",
         short: "[Edit mode]",
         description: "Edit the content of an existing post",
       },
@@ -273,8 +273,8 @@ const getPost = async () => {
 
 const actions = {
   create: createPost,
-  read: viewPost,
-  update: editPost,
+  view: viewPost,
+  edit: editPost,
   delete: deletePost,
 };
 
