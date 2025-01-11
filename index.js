@@ -55,8 +55,8 @@ const inquirePost = async (defaultPost) => {
   return { ...defaultPost, title, content, author };
 };
 
-const viewPost = async (id) => {
-  const post = posts.find((post) => post.id === id);
+const viewPost = async () => {
+  const post = await getPost();
 
   if (!post) {
     console.log(colors.red("Post not found!"));
@@ -97,8 +97,8 @@ const createPost = async () => {
   return newPost.id;
 };
 
-const editPost = async (id) => {
-  const postToEdit = posts.find((post) => post.id === id);
+const editPost = async () => {
+  const postToEdit = await getPost();
 
   if (!postToEdit) {
     console.log(colors.red("Post not found!"));
@@ -131,8 +131,8 @@ const editPost = async (id) => {
   separate();
 };
 
-const deletePost = async (id) => {
-  const postToDelete = posts.find((post) => post.id === id);
+const deletePost = async () => {
+  const postToDelete = await getPost();
 
   if (!postToDelete) {
     console.log(colors.red("Post not found!"));
@@ -151,7 +151,7 @@ const deletePost = async (id) => {
   }
 
   console.log(colors.italic(`Deleting post: [${postToDelete.title}}]...`));
-  posts = posts.filter((post) => post.id !== id);
+  posts = posts.filter((post) => post.id !== postToDelete.id);
   commitPostToFile();
 
   console.log(colors.green(`Post deleted successfully!`));
@@ -195,7 +195,7 @@ const getMenuAction = async () => {
 
 const getPost = async () => {
   const choicePosts = posts.map((post) => ({
-    value: post.id,
+    value: post,
     name: post.title,
     description: post.content.slice(0, 45) + "...",
     short: `[${post.title}] selected`,
@@ -203,7 +203,7 @@ const getPost = async () => {
   }));
 
   separate();
-  const selectedPostId = await search({
+  const selectedPost = await search({
     message: "Select/Search for a post:",
     source: async (query) => {
       if (!query) return choicePosts;
@@ -216,7 +216,7 @@ const getPost = async () => {
     },
   });
   separate();
-  return selectedPostId;
+  return selectedPost;
 };
 
 const actions = {
@@ -226,19 +226,30 @@ const actions = {
   delete: deletePost,
 };
 
-const main = async () => {
-  const action = await getMenuAction();
-  let selectedPost = null;
+const main = async (defaultAction) => {
+  const action = defaultAction ?? (await getMenuAction());
 
-  if (action === "create") {
-    await actions[action](selectedPost);
-  } else {
-    selectedPost = await getPost();
-    await actions[action](selectedPost);
-  }
+  await actions[action]();
 
-  main();
+  separate();
+  const nextAction = await select({
+    message: "What would you like to do next?",
+    choices: [
+      {
+        name: `${action[0].toUpperCase() + action.slice(1)} another post`,
+        value: action,
+      },
+      { name: "Back to menu", value: "menu" },
+      { name: "Exit", value: "exit" },
+    ],
+  });
+  separate();
+
+  if (nextAction === action) await main(nextAction);
+  else if (nextAction === "menu") await main();
 };
 
 await initializeApp();
 await main();
+
+// console.log(await getPost());
