@@ -5,6 +5,8 @@ import { input, select, search, confirm, Separator } from "@inquirer/prompts";
 /* This will contain and manage posts
 Post format: { id, title, date, content, author } */
 let posts = [];
+
+const wrappedContentLength = 54; // The wrap length of the post body
 const separate = () => console.log(new Separator().separator.repeat(4));
 const delay = async (milliseconds = 1000) => {
   new Promise((res) => setTimeout(res, milliseconds));
@@ -54,6 +56,7 @@ const viewPost = async () => {
 
   separate();
   console.log(colors.italic(`Viewing post: [id=${post.id}]...`));
+  separate();
 
   const viewMode = await select({
     message: "Select view mode:",
@@ -63,7 +66,14 @@ const viewPost = async () => {
     ],
   });
 
+  // Display wrapped post content/body. set the length using wrappedContentLength variable
+  let wrappedContent = "";
+  for (let i = 0; i < post.content.length; i += wrappedContentLength) {
+    wrappedContent += post.content.slice(i, i + wrappedContentLength) + "\n";
+  }
+
   separate();
+
   if (viewMode === "table") {
     console.table(post);
     return;
@@ -72,8 +82,10 @@ const viewPost = async () => {
     console.log(
       `${colors.green("Date:")} ${post.date ?? colors.italic("Unknown")}`
     );
-    console.log(`\n${colors.green("Content:")} ${post.content}`);
-    console.log(`${post.author ? colors.green("Author: ") + post.author : ""}`);
+    console.log(colors.green("Content:"));
+    console.log(wrappedContent);
+
+    if (post.author) console.log(`${colors.green("Author: ") + post.author}`);
   }
   separate();
 };
