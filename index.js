@@ -11,12 +11,7 @@ const delay = async (milliseconds = 1000) => {
 };
 
 const commitPostToFile = async () => {
-  await fs.writeFile(
-    "./posts.json",
-    JSON.stringify(posts, (key, value) =>
-      key === "date" ? new Date(value).toLocaleString() : value
-    )
-  );
+  await fs.writeFile("./posts.json", JSON.stringify(posts));
 };
 
 const readPostsFromFile = async () => {
@@ -96,7 +91,7 @@ const createPost = async () => {
     id: newPost.id,
     title: newPost.title,
     content: newPost.content,
-    date: new Date(),
+    date: new Date().toLocaleString(),
     author: newPost.author === "None" ? undefined : newPost.author,
   });
   commitPostToFile();
@@ -129,7 +124,7 @@ const editPost = async () => {
     !Object.keys(postToEdit).every((key) => editedPost[key] === postToEdit[key])
   ) {
     // If something changed in the edit, update the date else keep the old date
-    editedPost.date = new Date();
+    editedPost.date = new Date().toLocaleString();
   }
 
   Object.assign(postToEdit, editedPost);
