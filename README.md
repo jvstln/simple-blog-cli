@@ -11,26 +11,26 @@
 
 ## Description
 
-Simple Blog CLI is a command-line interface application designed to manage blog posts through the cli. It allows users to carry out crud operations on posts.
+Simple Blog CLI is an application designed to manage blog posts through the cli. It allows users to carry out crud operations on posts.
 
 ## Features
 
 - **Create Post**: Easily create new blog posts.
-- **View Post**: View the content of existing posts.
+- **View Post**: View the content of existing posts (both in block and tabular view).
 - **Edit Post**: Modify the content of existing posts.
 - **Delete Post**: Permanently delete posts.
 
-## Installation
+## Setup
 
-1. Clone the repository:
+1. Clone it:
    ```bash
-   git clone git@github.com:jvstln/simple-blog-cli.git
+   git clone https://github.com/jvstln/simple-blog-cli.git
    ```
-2. Navigate into the project directory:
+2. Move in:
    ```bash
    cd simple-blog-cli
    ```
-3. Install dependencies:
+3. Install:
    ```bash
    npm install
    ```
@@ -43,9 +43,9 @@ Start the CLI by running:
 npm start
 ```
 
-Follow the on-screen prompts to manage your blog posts.
+Follow the on-screen prompts to manage your blog posts. Every post is managed locally (in ./post.json file)
 
-## Packages
+## Packages Used
 
 - [@inquirer/prompts](https://www.npmjs.com/package/@inquirer/prompts)
 - [yoctocolors-cjs](https://www.npmjs.com/package/yoctocolors-cjs)
