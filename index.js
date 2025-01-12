@@ -52,6 +52,7 @@ const viewPost = async () => {
     return;
   }
 
+  separate();
   console.log(colors.italic(`Viewing post: [id=${post.id}]...`));
 
   const viewMode = await select({
@@ -121,12 +122,15 @@ const editPost = async () => {
   const editedPost = await inquirePost(postToEdit);
 
   if (
-    !Object.keys(postToEdit).every((key) => editedPost[key] === postToEdit[key])
+    Object.keys(postToEdit).every((key) => editedPost[key] === postToEdit[key])
   ) {
-    // If something changed in the edit, update the date else keep the old date
-    editedPost.date = new Date().toLocaleString();
+    // If nothing changed in the update, skip the update
+    console.log(colors.yellow("Nothing was updated"));
+    separate();
+    return;
   }
 
+  editedPost.date = new Date().toLocaleString();
   Object.assign(postToEdit, editedPost);
   commitPostToFile();
 
@@ -234,7 +238,7 @@ const getPost = async () => {
     console.log(
       `You only have one post. ${colors.italic(
         "proceeding with post"
-      )} ${colors.cyan(`[${posts[0].title}]`)} `
+      )}:${colors.cyan(`[${posts[0].title}]`)} `
     );
     await delay(2000);
 
