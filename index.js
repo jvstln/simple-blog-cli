@@ -168,14 +168,6 @@ const deletePost = async () => {
 };
 
 const getMenuAction = async () => {
-  const colorMapping = {
-    "create post": colors.green,
-    "view post": colors.cyan,
-    "edit post": colors.blue,
-    "delete post": colors.red,
-    exit: colors.redBright,
-  };
-
   separate();
   const answer = await select({
     message: "Pick one operation from below:",
@@ -300,6 +292,7 @@ const main = async (defaultAction) => {
 
   if (nextAction === action) await main(nextAction);
   else if (nextAction === "menu") await main();
+  else if (nextAction === "exit") throw new Error("exit");
 };
 
 // ----------The above functions and variables contains useful functions that control the cli--
