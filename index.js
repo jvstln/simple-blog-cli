@@ -220,10 +220,10 @@ const getPost = async () => {
       ],
     });
 
-    if (noPostAnswer === "create") await createPost();
-    else if (noPostAnswer === "menu") await main();
-    else if (noPostAnswer === "exit") throw new Error("exit");
-    return;
+    await main(noPostAnswer);
+
+    // After the above code flow finishes, exit the program
+    throw new Error("exit");
   }
 
   if (posts.length === 1) {
@@ -273,6 +273,7 @@ const main = async (defaultAction) => {
   const action = defaultAction ?? (await getMenuAction());
 
   if (action === "exit") return;
+  if (action === "menu") return await main();
 
   await actions[action]();
 
@@ -290,9 +291,8 @@ const main = async (defaultAction) => {
   });
   separate();
 
-  if (nextAction === action) await main(nextAction);
-  else if (nextAction === "menu") await main();
-  else if (nextAction === "exit") throw new Error("exit");
+  if (nextAction === "exit") throw new Error("exit");
+  await main(nextAction);
 };
 
 // ----------The above functions and variables contains useful functions that control the cli--
